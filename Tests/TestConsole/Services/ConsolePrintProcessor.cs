@@ -5,9 +5,9 @@ namespace TestConsole.Services
 {
     public class ConsolePrintProcessor : IDataProcessor
     {
-        public void Process(DataValue Value)
+        public void Process(DataValue value)
         {
-            Console.WriteLine("[{0}]({1}):{2}", Value.Id, Value.Time, Value.Value);
+            Console.WriteLine("[{0}]({1}):{2}", value.Id, value.Time, value.Value);
         }
     }
 }

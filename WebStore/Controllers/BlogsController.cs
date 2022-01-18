@@ -2,11 +2,16 @@
 
 namespace WebStore.Controllers
 {
-    //[Controller]
     public class BlogsController : Controller
     {
-        public IActionResult Index() => View();
+        public IActionResult Index()
+        {
+            return View();
+        }
 
-        public IActionResult Blog() => View();
+        public IActionResult Blog()
+        {
+            return View();
+        }
     }
 }

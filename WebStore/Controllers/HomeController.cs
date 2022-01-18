@@ -1,28 +1,28 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebStore.Infrastructure.Mapping;
-using WebStore.Services.Interfaces;
+using WebStore.Interfaces.ServiceInterfaces;
+using WebStore.Services.Mapping;
 
 namespace WebStore.Controllers;
 
 public class HomeController : Controller
 {
-    public IActionResult Index([FromServices] IProductData ProductData)
+    public IActionResult Index([FromServices] IProductData productData)
     {
-        var products = ProductData.GetProducts().OrderBy(p => p.Order).Take(6).ToView();
+        var products = productData.GetProducts().OrderBy(p => p.Order).Take(6).ToView();
         ViewBag.Products = products;
 
-        //ControllerContext.HttpContext.Request.RouteValues
-
-        //return Content("Данные из первого контроллера");
         return View();
     }
 
-    public string ConfiguredAction(string id, string Value1)
+    public string ConfiguredAction(string id, string value1)
     {
-        return $"Hello World! {id} - {Value1}";
+        return $"Hello World! {id} - {value1}";
     }
 
-    public void Throw(string Message) => throw new ApplicationException(Message);
+    public void Throw(string message)
+    {
+        throw new ApplicationException(message);
+    }
 
     public IActionResult Error404() => View();
 }

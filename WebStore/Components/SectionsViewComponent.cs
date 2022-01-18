@@ -1,23 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebStore.Services.Interfaces;
-using WebStore.ViewModels;
+using WebStore.Domain.ViewModels;
+using WebStore.Interfaces.ServiceInterfaces;
 
 namespace WebStore.Components;
 
-//[ViewComponent(Name = "sections")]
+
 public class SectionsViewComponent : ViewComponent
 {
-    private readonly IProductData _ProductData;
+    private readonly IProductData _productData;
 
-    public SectionsViewComponent(IProductData ProductData) => _ProductData = ProductData;
+    public SectionsViewComponent(IProductData productData)
+    {
+        _productData = productData;
+    }
 
     public IViewComponentResult Invoke()
     {
-        var sections = _ProductData.GetSections();
+        var sections = _productData.GetSections();
+        var parentSections = sections.Where(s => s.ParentId is null);
 
-        var parent_sections = sections.Where(s => s.ParentId is null);
-
-        var parent_sections_views = parent_sections
+        var parentSectionsViews = parentSections
            .Select(s => new SectionViewModel
             {
                Id = s.Id,
@@ -26,24 +28,26 @@ public class SectionsViewComponent : ViewComponent
             })
            .ToList();
 
-        foreach (var parent_section in parent_sections_views)
+        foreach (var parentSection in parentSectionsViews)
         {
-            var childs = sections.Where(s => s.ParentId == parent_section.Id);
+            var childs = sections.Where(s => s.ParentId == parentSection.Id);
 
-            foreach (var child_section in childs)
-                parent_section.ChildSections.Add(new SectionViewModel
+            foreach (var childSection in childs)
+            {
+                parentSection.ChildSections.Add(new SectionViewModel
                 {
-                    Id = child_section.Id,
-                    Name = child_section.Name,
-                    Order = child_section.Order,
-                    Parent = parent_section
+                    Id = childSection.Id,
+                    Name = childSection.Name,
+                    Order = childSection.Order,
+                    Parent = parentSection
                 });
+            }
 
-            parent_section.ChildSections.Sort((a, b) => Comparer<int>.Default.Compare(a.Order, b.Order));
+            parentSection.ChildSections.Sort((a, b) => Comparer<int>.Default.Compare(a.Order, b.Order));
         }
 
-        parent_sections_views.Sort((a, b) => Comparer<int>.Default.Compare(a.Order, b.Order));
+        parentSectionsViews.Sort((a, b) => Comparer<int>.Default.Compare(a.Order, b.Order));
 
-        return View(parent_sections_views);
+        return View(parentSectionsViews);
     }
 }

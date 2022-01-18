@@ -11,7 +11,7 @@ using WebStore.DAL.Context;
 
 namespace WebStore.DAL.Migrations
 {
-    [DbContext(typeof(WebStoreDB))]
+    [DbContext(typeof(WebStoreDb))]
     [Migration("20220114173145_Orders")]
     partial class Orders
     {

@@ -4,12 +4,12 @@ namespace TestConsole.Services.Interfaces
 {
     public interface IDataManager
     {
-        void ProcessData(IEnumerable<DataValue> Values);
+        void ProcessData(IEnumerable<DataValue> values);
     }
 
 
     public interface IDataProcessor
     {
-        void Process(DataValue Value);
+        void Process(DataValue value);
     }
 }

@@ -5,17 +5,19 @@ namespace TestConsole.Services
 {
     public class DataManager : IDataManager, IDisposable
     {
-        private readonly IDataProcessor _Processor;
+        private readonly IDataProcessor _processor;
 
-        public DataManager(IDataProcessor Processor)
+        public DataManager(IDataProcessor processor)
         {
-            _Processor = Processor;
+            _processor = processor;
         }
 
-        public void ProcessData(IEnumerable<DataValue> Values)
+        public void ProcessData(IEnumerable<DataValue> values)
         {
-            foreach (var value in Values)
-                _Processor.Process(value);
+            foreach (var value in values)
+            {
+                _processor.Process(value);
+            }
         }
 
         public void Dispose()

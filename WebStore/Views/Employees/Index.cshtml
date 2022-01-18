@@ -8,7 +8,7 @@
 
 <h3>Сотрудники</h3>
     
-@if (User.IsInRole(Role.Administrators))
+@if (User.IsInRole(Role.ADMINISTRATORS))
 {
     <a class="btn btn-default" asp-action="Edit">Создать</a> 
     <br/>
@@ -26,7 +26,7 @@
             <th>@Html.DisplayNameFor(m => m.FirstName)</th>
             <th>@Html.DisplayNameFor(m => m.Patronymic)</th>
             <th>@Html.DisplayNameFor(m => m.Age)</th>
-            @if (User.IsInRole(Role.Administrators))
+            @if (User.IsInRole(Role.ADMINISTRATORS))
             {
                 <th></th>
             }
@@ -40,7 +40,7 @@
                     <a asp-action="Details" asp-route-Id="@employee.Id" asp-route-Info="123">
                         <i class="fa fa-info-circle"></i>
                     </a>
-                    @if (User.IsInRole(Role.Administrators))
+                    @if (User.IsInRole(Role.ADMINISTRATORS))
                     {
                         <a asp-action="Edit" asp-route-Id="@employee.Id" asp-route-Info="123">
                             <i class="fa fa-edit"></i>
@@ -52,7 +52,7 @@
                 <td>@employee.FirstName</td>
                 <td>@employee.Patronymic</td>
                 <td>@employee.Age</td>
-                @if (User.IsInRole(Role.Administrators))
+                @if (User.IsInRole(Role.ADMINISTRATORS))
                 {
                     <td>
                         <a asp-action="Delete" asp-route-Id="@employee.Id" asp-route-Info="123" class="text-danger">

@@ -1,36 +1,37 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebStore.Areas.Admin.ViewModels;
-using WebStore.Domain.Entities;
 using WebStore.Domain.Entities.Identity;
-using WebStore.Services.Interfaces;
+using WebStore.Interfaces.ServiceInterfaces;
 
 namespace WebStore.Areas.Admin.Controllers;
 
-[Area("Admin"), Authorize(Roles = Role.Administrators)]
+[Area("Admin"), Authorize(Roles = Role.ADMINISTRATORS)]
 public class ProductsController : Controller
 {
-    private readonly IProductData _ProductData;
-    private readonly ILogger<ProductsController> _Logger;
+    private readonly IProductData _productData;
+    private readonly ILogger<ProductsController> _logger;
 
-    public ProductsController(IProductData ProductData, ILogger<ProductsController> Logger)
+    public ProductsController(IProductData productData, ILogger<ProductsController> logger)
     {
-        _ProductData = ProductData;
-        _Logger = Logger;
+        _productData = productData;
+        _logger = logger;
     }
 
     public IActionResult Index()
     {
-        var products = _ProductData.GetProducts();
+        var products = _productData.GetProducts();
         return View(products);
     }
 
     public IActionResult Edit(int id)
     {
-        var product = _ProductData.GetProductById(id);
+        var product = _productData.GetProductById(id);
 
         if (product is null)
+        {
             return NotFound();
+        }
 
         return View(new EditProductViewModel
         {
@@ -47,65 +48,45 @@ public class ProductsController : Controller
     }
 
     [HttpPost]
-    public IActionResult Edit(EditProductViewModel Model)
+    public IActionResult Edit(EditProductViewModel model)
     {
         if (!ModelState.IsValid)
-            return View(Model);
+        {
+            return View(model);
+        }
 
-        var product = _ProductData.GetProductById(Model.Id);
-        if (product is null)
-            return NotFound();
+        var product = _productData.GetProductById(model.Id);
 
-        //product.Name = Model.Name;
-        //product.Order = Model.Order;
-        //product.Price = Model.Price;
-        //product.ImageUrl = Model.ImageUrl;
-
-        //var brand = _ProductData.GetBrandById(Model.BrandId ?? -1);
-        //var section = _ProductData.GetSectionById(Model.SectionId);
-
-        //product.Brand = brand;
-        //product.Section = section;
-
-        //_ProductData.Update(product);
-
-        // отредактировать product используя сервис _ProductData
-
-        return RedirectToAction(nameof(Index));
+        return product is null ? NotFound() : RedirectToAction(nameof(Index));
     }
 
     public IActionResult Delete(int id)
     {
-        var product = _ProductData.GetProductById(id);
+        var product = _productData.GetProductById(id);
 
-        if (product is null)
-            return NotFound();
-
-        return View(new EditProductViewModel
-        {
-            Id = product.Id,
-            Name = product.Name,
-            Order = product.Order,
-            SectionId = product.SectionId,
-            Section = product.Section.Name,
-            Brand = product.Brand?.Name,
-            BrandId = product.BrandId,
-            ImageUrl = product.ImageUrl,
-            Price = product.Price,
-        });
+        return product is null
+            ? NotFound()
+            : View(new EditProductViewModel
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Order = product.Order,
+                SectionId = product.SectionId,
+                Section = product.Section.Name,
+                Brand = product.Brand?.Name,
+                BrandId = product.BrandId,
+                ImageUrl = product.ImageUrl,
+                Price = product.Price,
+            });
     }
 
     [HttpPost]
-    public IActionResult DeleteConfirmed(int Id)
+    public IActionResult DeleteConfirmed(int id)
     {
-        var product = _ProductData.GetProductById(Id);
+        var product = _productData.GetProductById(id);
 
-        if (product is null)
-            return NotFound();
-
-        //_ProductData.Delete(product);
-        // удалить product используя сервис _ProductData
-
-        return RedirectToAction(nameof(Index));
+        return product is null 
+            ? NotFound() 
+            : RedirectToAction(nameof(Index));
     }
 }

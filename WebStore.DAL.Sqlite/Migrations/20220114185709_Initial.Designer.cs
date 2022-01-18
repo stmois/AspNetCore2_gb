@@ -10,7 +10,7 @@ using WebStore.DAL.Context;
 
 namespace WebStore.DAL.Sqlite.Migrations
 {
-    [DbContext(typeof(WebStoreDB))]
+    [DbContext(typeof(WebStoreDb))]
     [Migration("20220114185709_Initial")]
     partial class Initial
     {

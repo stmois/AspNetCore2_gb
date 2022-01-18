@@ -1,46 +1,46 @@
-﻿using System.Globalization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using WebStore.Domain;
-using WebStore.Infrastructure.Mapping;
-using WebStore.Services.Interfaces;
-using WebStore.ViewModels;
+using WebStore.Domain.ViewModels;
+using WebStore.Interfaces.ServiceInterfaces;
+using WebStore.Services.Mapping;
 
 namespace WebStore.Controllers;
 
 public class CatalogController : Controller
 {
-    private readonly IProductData _ProductData;
+    private readonly IProductData _productData;
 
-    public CatalogController(IProductData ProductData) => _ProductData = ProductData;
+    public CatalogController(IProductData productData)
+    {
+        _productData = productData;
+    }
 
-    public IActionResult Index(int? BrandId, int? SectionId)
+    public IActionResult Index(int? brandId, int? sectionId)
     {
         var filter = new ProductFilter
         {
-            BrandId = BrandId,
-            SectionId = SectionId,
+            BrandId = brandId,
+            SectionId = sectionId,
         };
 
-        var products = _ProductData.GetProducts(filter);
+        var products = _productData.GetProducts(filter);
 
-        var catalog_model = new CatalogViewModel
+        var catalogModel = new CatalogViewModel
         {
-            BrandId = BrandId,
-            SectionId = SectionId,
+            BrandId = brandId,
+            SectionId = sectionId,
             Products = products.OrderBy(p => p.Order).ToView(),
         };
 
-        return View(catalog_model);
+        return View(catalogModel);
     }
 
-    public IActionResult Details(int Id)
+    public IActionResult Details(int id)
     {
-        var product = _ProductData.GetProductById(Id);
-        //CultureInfo.CurrentUICulture = 
-        //    CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("ru-RU");
-        if (product is null)
-            return NotFound();
+        var product = _productData.GetProductById(id);
 
-        return View(product.ToView());
+        return product is null 
+            ? NotFound() 
+            : View(product.ToView());
     }
 }

@@ -1,19 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebStore.Services.Interfaces;
-using WebStore.ViewModels;
+using WebStore.Domain.ViewModels;
+using WebStore.Interfaces.ServiceInterfaces;
 
 namespace WebStore.Components;
 
 public class BrandsViewComponent : ViewComponent
 {
-    private readonly IProductData _ProductData;
+    private readonly IProductData _productData;
 
-    public BrandsViewComponent(IProductData ProductData) => _ProductData = ProductData;
+    public BrandsViewComponent(IProductData productData)
+    {
+        _productData = productData;
+    }
 
-    public IViewComponentResult Invoke() => View(GetBrands());
+    public IViewComponentResult Invoke()
+    {
+        return View(GetBrands());
+    }
 
     private IEnumerable<BrandViewModel> GetBrands() =>
-        _ProductData.GetBrands()
+        _productData.GetBrands()
            .OrderBy(b => b.Order)
            .Select(b => new BrandViewModel
             {

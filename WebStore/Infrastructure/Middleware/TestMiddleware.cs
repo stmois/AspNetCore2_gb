@@ -2,26 +2,23 @@
 
 public class TestMiddleware
 {
-    private readonly RequestDelegate _Next;
+    private readonly RequestDelegate _next;
 
-    public TestMiddleware(RequestDelegate Next)
+    public TestMiddleware(RequestDelegate next)
     {
-        _Next = Next;
+        _next = next;
     }
 
-    public async Task Invoke(HttpContext Context)
+    public async Task Invoke(HttpContext context)
     {
-        var controller_name = Context.Request.RouteValues["controller"];
-        var action_name = Context.Request.RouteValues["action"];
+        // ReSharper disable once UnusedVariable
+        var controllerName = context.Request.RouteValues["controller"];
 
-        // Обработка информации из Context.Request
+        // ReSharper disable once UnusedVariable
+        var actionName = context.Request.RouteValues["action"];
 
-        var processing_task = _Next(Context); // далее здесь работает оставшаяся часть конвейера
+        var processingTask = _next(context);
 
-        // Выполнить какие-то действия параллельно асинхронно с остальной частью конвейера
-
-        await processing_task;
-
-        // Дообработка данных в Context.Response
+        await processingTask;
     }
 }

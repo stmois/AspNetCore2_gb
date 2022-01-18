@@ -1,60 +1,68 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebStore.Services.Interfaces;
-using WebStore.ViewModels;
+using WebStore.Domain.ViewModels;
+using WebStore.Interfaces.ServiceInterfaces;
 
 namespace WebStore.Controllers;
 
 public class CartController : Controller
 {
-    private readonly ICartService _CartService;
+    private readonly ICartService _cartService;
 
-    public CartController(ICartService CartService) => _CartService = CartService;
-
-    public IActionResult Index() => View(new CartOrderViewModel { Cart = _CartService.GetViewModel() });
-
-    public IActionResult Add(int Id)
+    public CartController(ICartService cartService)
     {
-        _CartService.Add(Id);
+        _cartService = cartService;
+    }
+
+    public IActionResult Index()
+    {
+        return View(new CartOrderViewModel { Cart = _cartService.GetViewModel() });
+    }
+
+    public IActionResult Add(int id)
+    {
+        _cartService.Add(id);
         return RedirectToAction("Index", "Cart");
     }
 
-    public IActionResult Decrement(int Id)
+    public IActionResult Decrement(int id)
     {
-        _CartService.Decrement(Id);
+        _cartService.Decrement(id);
         return RedirectToAction("Index", "Cart");
     }
 
-    public IActionResult Remove(int Id)
+    public IActionResult Remove(int id)
     {
-        _CartService.Remove(Id);
+        _cartService.Remove(id);
         return RedirectToAction("Index", "Cart");
     }
 
     [Authorize]
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> CheckOut(OrderViewModel OrderModel, [FromServices] IOrderService OrderService)
+    public async Task<IActionResult> CheckOut(OrderViewModel orderModel, [FromServices] IOrderService orderService)
     {
         if (!ModelState.IsValid)
+        {
             return View(nameof(Index), new CartOrderViewModel
             {
-                Cart = _CartService.GetViewModel(),
-                Order = OrderModel
+                Cart = _cartService.GetViewModel(),
+                Order = orderModel
             });
+        }
 
-        var order = await OrderService.CreateOrderAsync(
+        var order = await orderService.CreateOrderAsync(
             User.Identity!.Name!,
-            _CartService.GetViewModel(),
-            OrderModel);
+            _cartService.GetViewModel(),
+            orderModel);
 
-        _CartService.Clear();
+        _cartService.Clear();
 
         return RedirectToAction(nameof(OrderConfirmed), new { order.Id });
     }
 
-    public IActionResult OrderConfirmed(int Id)
+    public IActionResult OrderConfirmed(int id)
     {
-        ViewBag.OrderId = Id;
+        ViewBag.OrderId = id;
         return View();
     }
 }

@@ -1,84 +1,94 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WebStore.Domain.Entities.Identity;
-using WebStore.ViewModels.Identity;
+using WebStore.Domain.ViewModels.Identity;
 
 namespace WebStore.Controllers;
 
 public class AccountController : Controller
 {
-    private readonly UserManager<User> _UserManager;
-    private readonly SignInManager<User> _SignInManager;
+    private readonly UserManager<User> _userManager;
+    private readonly SignInManager<User> _signInManager;
 
-    public AccountController(UserManager<User> UserManager, SignInManager<User> SignInManager)
+    public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
     {
-        _UserManager = UserManager;
-        _SignInManager = SignInManager;
+        _userManager = userManager;
+        _signInManager = signInManager;
     }
 
-    public IActionResult Register() => View(new RegisterUserViewModel());
+    public IActionResult Register()
+    {
+        return View(new RegisterUserViewModel());
+    }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(RegisterUserViewModel Model)
+    public async Task<IActionResult> Register(RegisterUserViewModel model)
     {
         if (!ModelState.IsValid)
-            return View(Model);
+        {
+            return View(model);
+        }
 
         var user = new User
         {
-            UserName = Model.UserName,
+            UserName = model.UserName,
         };
 
-        var registration_result = await _UserManager.CreateAsync(user, Model.Password).ConfigureAwait(true);
-        if (registration_result.Succeeded)
-        {
-            await _UserManager.AddToRoleAsync(user, Role.Users).ConfigureAwait(true);
+        var registrationResult = await _userManager.CreateAsync(user, model.Password).ConfigureAwait(true);
 
-            await _SignInManager.SignInAsync(user, false).ConfigureAwait(true);
+        if (registrationResult.Succeeded)
+        {
+            await _userManager.AddToRoleAsync(user, Role.USERS).ConfigureAwait(true);
+            await _signInManager.SignInAsync(user, false).ConfigureAwait(true);
+
             return RedirectToAction("Index", "Home");
         }
 
-        foreach (var error in registration_result.Errors)
+        foreach (var error in registrationResult.Errors)
+        {
             ModelState.AddModelError("", error.Description);
+        }
 
-        return View(Model);
+        return View(model);
     }
 
-    public IActionResult Login(string ReturnUrl) => View(new LoginViewModel { ReturnUrl = ReturnUrl });
+    public IActionResult Login(string returnUrl)
+    {
+        return View(new LoginViewModel { ReturnUrl = returnUrl });
+    }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginViewModel Model)
+    public async Task<IActionResult> Login(LoginViewModel model)
     {
         if (!ModelState.IsValid)
-            return View(Model);
+        {
+            return View(model);
+        }
 
-        var login_result = await _SignInManager.PasswordSignInAsync(
-            Model.UserName,
-            Model.Password,
-            Model.RememberMe,
+        var loginResult = await _signInManager.PasswordSignInAsync(
+            model.UserName,
+            model.Password,
+            model.RememberMe,
             true).ConfigureAwait(true);
 
-        if (login_result.Succeeded)
+        if (loginResult.Succeeded)
         {
-            //return Redirect(Model.ReturnUrl); // Не безопасно!!!
-
-            //if(Url.IsLocalUrl(Model.ReturnUrl))
-            //    return Redirect(Model.ReturnUrl);
-            //return RedirectToAction("Index", "Home");
-
-            return LocalRedirect(Model.ReturnUrl ?? "/");
+            return LocalRedirect(model.ReturnUrl ?? "/");
         }
 
         ModelState.AddModelError("", "Неверное имя пользователя, или пароль");
 
-        return View(Model);
+        return View(model);
     }
 
     public async Task<IActionResult> Logout()
     {
-        await _SignInManager.SignOutAsync().ConfigureAwait(true);
+        await _signInManager.SignOutAsync().ConfigureAwait(true);
         return RedirectToAction("Index", "Home");
     }
 
-    public IActionResult AccessDenied() => View();
+    public IActionResult AccessDenied()
+    {
+        return View();
+    }
 }

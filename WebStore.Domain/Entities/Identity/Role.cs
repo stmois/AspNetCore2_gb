@@ -4,7 +4,7 @@ namespace WebStore.Domain.Entities.Identity;
 
 public class Role : IdentityRole
 {
-    public const string Administrators = "Administrators";
+    public const string ADMINISTRATORS = "Administrators";
 
-    public const string Users = "Users";
+    public const string USERS = "Users";
 }
