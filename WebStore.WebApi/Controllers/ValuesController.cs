@@ -19,13 +19,13 @@ namespace WebStore.WebApi.Controllers
             _logger = logger;
         }
 
-        [HttpGet] // GET -> http://localhost:5001/api/values
+        [HttpGet]
         public IActionResult Get()
         {
             return Ok(_data.Values);
         }
 
-        [HttpGet("{id}")] // GET -> /api/values/5
+        [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
             return !_data.ContainsKey(id) 
@@ -33,7 +33,7 @@ namespace WebStore.WebApi.Controllers
                 : Ok(_data[id]);
         }
 
-        [HttpGet("count")] // GET -> /api/values/count
+        [HttpGet("count")]
         //public IActionResult Count() => Ok(_Values.Count);
         //public ActionResult<int> Count() => _Values.Count;
         public int Count()
@@ -41,8 +41,7 @@ namespace WebStore.WebApi.Controllers
             return _data.Count;
         }
 
-        [HttpPost] // POST -> /api/values
-        [HttpPost("add")] // POST -> /api/values/add
+        [HttpPost("add")] 
         public IActionResult Add([FromBody] string value)
         {
             var id = _data.Count == 0 ? 1 : _data.Keys.Max() + 1;
@@ -51,7 +50,7 @@ namespace WebStore.WebApi.Controllers
             return CreatedAtAction(nameof(GetById), new { id });
         }
 
-        [HttpPut("{id}")] // PUT -> /api/values/5
+        [HttpPut("{id:int}")]
         public IActionResult Replace(int id, [FromBody] string value)
         {
             if (!_data.ContainsKey(id))
@@ -64,7 +63,7 @@ namespace WebStore.WebApi.Controllers
             return Ok();
         }
 
-        [HttpDelete("{id}")] // DELETE -> /api/values/5
+        [HttpDelete("{id:int}")]
         public IActionResult Delete(int id)
         {
             if (!_data.ContainsKey(id))
