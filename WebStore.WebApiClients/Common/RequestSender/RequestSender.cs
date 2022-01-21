@@ -1,16 +1,18 @@
 ﻿using System.Net.Http.Json;
 using WebStore.Domain.Enums;
-using WebStore.WebApiClients.Base;
 
 namespace WebStore.WebApiClients.Common.RequestSender;
 
 public class RequestSender: IRequestSender
 {
-    private readonly Uri _baseAddress; 
-    
+    private readonly HttpClient _client; 
+
     public RequestSender(Uri baseAddress)
     {
-        _baseAddress = baseAddress;
+        _client = new HttpClient
+            {
+                BaseAddress = baseAddress
+            };
     }
 
     public async Task<HttpResponseMessage> GetResponse(
@@ -20,28 +22,29 @@ public class RequestSender: IRequestSender
         int? requestId = null,
         string? requestValue = null)
     {
-        var httpClient = new HttpClient();
-        httpClient.BaseAddress = _baseAddress;
-        var requestAddress = $"{_baseAddress}{apiUrl}";
-        var client = new ApiClient(httpClient, requestAddress);
 
-        var requestUrl = $"{client.Address}{urlExtension}";
+        var requestAddress = $"{_client.BaseAddress}{apiUrl}";
 
+        if (!string.IsNullOrWhiteSpace(urlExtension))
+        {
+            requestAddress = $"{requestAddress}/{urlExtension}";
+        }
+        
         switch (requestType)
         {
             case RequestType.Get:
                 return requestId == null
-                    ? await client.HttpClient.GetAsync(requestUrl)
-                    : await client.HttpClient.GetAsync($"{requestUrl}/{requestId}");
+                    ? await _client.GetAsync(requestAddress)
+                    : await _client.GetAsync($"{requestAddress}/{requestId}");
 
             case RequestType.Post:
-                return await client.HttpClient.PostAsJsonAsync(requestUrl, requestValue);
+                return await _client.PostAsJsonAsync(requestAddress, requestValue);
 
             case RequestType.Put:
-                return await client.HttpClient.PutAsJsonAsync($"{requestUrl}/{requestId}", requestValue);
+                return await _client.PutAsJsonAsync($"{requestAddress}/{requestId}", requestValue);
 
             case RequestType.Delete:
-                return await client.HttpClient.DeleteAsync($"{requestUrl}/{requestId}");
+                return await _client.DeleteAsync($"{requestAddress}/{requestId}");
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(requestType), requestType, null);
