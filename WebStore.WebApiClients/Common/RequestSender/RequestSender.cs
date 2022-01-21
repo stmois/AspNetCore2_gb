@@ -6,6 +6,13 @@ namespace WebStore.WebApiClients.Common.RequestSender;
 
 public class RequestSender: IRequestSender
 {
+    private readonly Uri _baseAddress; 
+    
+    public RequestSender(Uri baseAddress)
+    {
+        _baseAddress = baseAddress;
+    }
+
     public async Task<HttpResponseMessage> GetResponse(
         string apiUrl,
         RequestType requestType, 
@@ -13,7 +20,11 @@ public class RequestSender: IRequestSender
         int? requestId = null,
         string? requestValue = null)
     {
-        var client = new ApiClient(new HttpClient(), apiUrl);
+        var httpClient = new HttpClient();
+        httpClient.BaseAddress = _baseAddress;
+        var requestAddress = $"{_baseAddress}{apiUrl}";
+        var client = new ApiClient(httpClient, requestAddress);
+
         var requestUrl = $"{client.Address}{urlExtension}";
 
         switch (requestType)

@@ -42,7 +42,10 @@ switch (databaseType)
 }
 
 services.AddTransient<IDbInitializer, DbInitializer>();
-services.AddTransient<IRequestSender, RequestSender>();
+
+var configuration = builder.Configuration;
+
+services.AddTransient<IRequestSender>(_ => new RequestSender(new Uri(configuration["WebAPI"])));
 services.AddTransient<IValuesClientService, ValuesClientService>();
 
 services.AddIdentity<User, Role>()
