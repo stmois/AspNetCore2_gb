@@ -8,6 +8,8 @@ using WebStore.Interfaces.ServiceInterfaces;
 using WebStore.Services.Services;
 using WebStore.Services.Services.InCookies;
 using WebStore.Services.Services.InSQL;
+using WebStore.WebApiClients.Common.RequestSender;
+using WebStore.WebApiClients.Values;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +42,11 @@ switch (databaseType)
 }
 
 services.AddTransient<IDbInitializer, DbInitializer>();
+
+var configuration = builder.Configuration;
+
+services.AddTransient<IRequestSender>(_ => new RequestSender(new Uri(configuration["WebAPI"])));
+services.AddTransient<IValuesClientService, ValuesClientService>();
 
 services.AddIdentity<User, Role>()
    .AddEntityFrameworkStores<WebStoreDb>()
